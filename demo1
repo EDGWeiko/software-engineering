@@ -1,0 +1,53 @@
+from selenium import webdriver
+from lxml import etree
+from selenium.webdriver.common.by import By
+import time
+import mysql.connector
+
+def get_data(url):
+    html = driver.page_source
+    bs = etree.HTML(html)
+    lis = bs.xpath('//*[@id="table_wrapper-table"]/tbody/tr')
+    for link in lis:
+        a = link.xpath('./td[2]/a/text()')[0]
+        b = link.xpath('./td[3]/a/text()')[0]
+        c = link.xpath('./td[5]/span/text()')[0]
+        d = link.xpath('./td[6]/span/text()')[0]
+        e = link.xpath('./td[7]/span/text()')[0]
+        f = link.xpath('./td[8]/text()')[0]
+        g = link.xpath('./td[9]/text()')[0]
+        h = link.xpath('./td[10]/text()')[0]
+        i = link.xpath('./td[11]/span/text()')[0]
+        j = link.xpath('./td[12]/span/text()')[0]
+        k = link.xpath('./td[13]/span/text()')[0]
+        l = link.xpath('./td[14]/text()')[0]
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="wjy514520",
+            database="mydb"
+        )
+        mycursor = mydb.cursor()
+
+        sql = "INSERT INTO shiyan42 (代码, 名称, 最新价, 涨跌幅, 涨跌额, 成交量, 成交额, 振幅, 最高, 最低, 今开, 昨收) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        val = (a, b, c, d, e, f, g, h, i, j, k, l)
+        mycursor.execute(sql, val)
+        mydb.commit()
+        print(a,b,c,d,e,f,g,h,i,j,k,l)
+    next_button = driver.find_element(By.XPATH, url)
+    next_button.click()
+    time.sleep(2)
+
+
+
+
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--disable-gpu')
+
+driver = webdriver.Chrome(options=chrome_options)
+
+driver.get("https://quote.eastmoney.com/center/gridlist.html#hs_a_board")
+get_data('//*[@id="nav_sh_a_board"]/a')
+get_data('//*[@id="nav_sz_a_board"]/a')
+get_data('//*[@id="nav_bj_a_board"]/a')
